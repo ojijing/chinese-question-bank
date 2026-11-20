@@ -12,8 +12,8 @@ CONFIG_XLSX_PATH = Path(
 STATIC_DIR = Path(os.getenv("TIKU_STATIC_DIR", ROOT_DIR / "static")).resolve()
 DB_STATE_PATH = DATA_DIR / "current-db.txt"
 
-APP_NAME = "初中语文智能题库"
-APP_VERSION = "2.1.0"
+APP_NAME = "智能题库系统"
+APP_VERSION = "2.2.0"
 DEFAULT_PAGE_SIZE = 12
 MAX_PAGE_SIZE = 60
 

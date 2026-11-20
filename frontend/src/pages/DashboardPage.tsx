@@ -65,6 +65,8 @@ export function DashboardPage() {
     .sort((a, b) => b.total - a.total)
     .slice(0, 5)
 
+  const subject = (meta.database.file_name || '题库').replace(/\.(db|sqlite3?)$/i, '')
+
   const stats = [
     { label: '题库总量', value: meta.database.question_count.toLocaleString(), suffix: '道', icon: Database, tone: 'red' },
     { label: '试卷来源', value: meta.database.paper_count.toLocaleString(), suffix: '套', icon: FileStack, tone: 'gold' },
@@ -76,7 +78,7 @@ export function DashboardPage() {
     <div className="dashboard-page">
       <section className="hero-banner">
         <div className="hero-copy">
-          <span className="eyebrow light">初中语文 · 本地题库</span>
+          <span className="eyebrow light">{subject} · 本地题库</span>
           <h2>从 {meta.database.question_count.toLocaleString()} 道题中，<br />快速组成一份好试卷。</h2>
           <p>检索、筛选、编辑、入篮与 DOCX 导出集中在同一工作流中完成。</p>
           <div className="hero-actions">
@@ -91,8 +93,8 @@ export function DashboardPage() {
           </div>
         </div>
         <div className="hero-seal" aria-hidden="true">
-          <span>语</span>
-          <small>文以载道</small>
+          <span>{subject.slice(0, 1)}</span>
+          <small>题库工作台</small>
         </div>
         <div className="hero-lines" aria-hidden="true" />
       </section>

@@ -25,7 +25,7 @@ import type { ExportMode, Question } from '../types'
 
 function defaultTitle(): string {
   const now = new Date()
-  return `${now.getFullYear()}年${now.getMonth() + 1}月自组语文试题`
+  return `${now.getFullYear()}年${now.getMonth() + 1}月自组试卷`
 }
 
 export function BasketPage() {

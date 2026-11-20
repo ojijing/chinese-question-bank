@@ -1,56 +1,129 @@
-# 初中语文智能题库（React + FastAPI 重建版）
+# 智能题库系统（React + FastAPI）
 
-基于原 Streamlit 题库雏形重建。保留题目筛选、试题篮、试卷浏览、题目编辑、单题/整卷 DOCX 导出等核心流程，并补充了数据总览、智能随机组卷、响应式界面和本地参数表导出。
+通用的本地题库工作台。系统主题、题库名称和学科内容由当前 SQLite 数据库决定，不局限于语文；切换数据库后，页面标题、统计和筛选项都会随新题库变化。
 
-- 前端：React 19 + TypeScript + Vite
+- 前端：React 19 + TypeScript + Vite，运行时使用已编译产物
 - 后端：FastAPI + 原生 `sqlite3`
-- 数据库：原项目 `初中语文/data.db`，共 146,782 道题、8,077 套试卷
+- 数据库：兼容原题库表结构的 SQLite 文件；仓库和离线包均不包含数据库
 - DOCX：内置 HTML2DOCX 转换，与题库共用同一端口，**不使用 pandoc**
 - 认证：无登录、无账号体系
 - 试题篮：保存在浏览器 `localStorage`
+- 当前示例题库：`初中语文.db`，146,782 道题、8,077 套试卷（需自行提供数据库文件）
+
+GitHub：<https://github.com/ojijing/chinese-question-bank>
 
 ## 目录结构
 
 ```text
 .
 ├── main.py                  # 项目总入口（FastAPI + 静态前端）
-├── start.sh                 # 创建虚拟环境、安装依赖并启动
+├── start.sh                 # 使用系统 Python 安装依赖并启动
 ├── requirements.txt
 ├── backend/                 # 后端功能模块
 │   └── app/
 │       ├── main.py          # FastAPI 应用
-│       ├── routers/         # 题目、试卷、导出、参数、统计接口
-│       ├── services/        # SQLite 查询、HTML 组装、DOCX 代理、参数表
+│       ├── routers/         # 题库、试卷、导出、参数、数据库接口
+│       ├── services/        # SQLite 查询、HTML 组装、内置 DOCX 转换
 │       ├── database.py
 │       └── config.py
-├── frontend/                # React 源码与 package.json
+├── frontend/                # React 源码与构建配置
 │   └── src/
-│       ├── pages/           # 各功能页面
+│       ├── pages/           # 功能页面
 │       ├── components/      # 复用组件
 │       ├── context/         # 试题篮与提示消息状态
 │       └── api/             # 后端接口封装
 ├── static/                  # 静态文件与前端构建产物
-│   ├── app/                 # Vite 构建结果
+│   ├── app/                 # Vite 构建结果，运行时使用
 │   ├── help.png
 │   └── favicon.svg
-└── data/
-    ├── data.db              # SQLite 数据库
-    └── config.xlsx          # 难度、题型、知识点分类
+├── data/
+│   ├── data.db              # 本地数据库，需自行放置，已忽略提交
+│   └── config.xlsx          # 难度、题型、知识点分类
+├── docs/screenshots/        # 本 README 使用的界面截图
+└── windows-package/
+    └── 语文题库-Windows.zip # Windows 离线包，不含数据库和前端源码
 ```
 
-功能模块、前端源码、静态文件与数据库分别存放，根目录 `main.py` 作为统一入口。
+功能模块、前端源码、静态文件、截图与数据文件分别存放，根目录 `main.py` 是统一入口。
+
+## 页面预览
+
+### 数据总览
+
+展示当前题库的题量、试卷数、知识点数、题型分布、难度构成、重点知识板块和最近试卷。页面顶部的学科名称来自数据库 `db_info.file_name`。
+
+![数据总览](docs/screenshots/01-dashboard.jpg)
+
+### 题库检索
+
+题干关键词、题型、难度和排序放在搜索结果上方；左侧为知识点树。切换知识点后，列表与统计会同步变化。
+
+![题库检索](docs/screenshots/02-questions.jpg)
+
+知识点树最多支持三级结构，点击一级、二级或三级节点都可以按该分类下的全部知识点筛选。
+
+![知识点筛选](docs/screenshots/03-knowledge-filter.jpg)
+
+### 智能组卷
+
+支持按数量、题型、难度、知识点和关键词随机抽题，并可以排除试题篮中已有的题目。
+
+![智能组卷](docs/screenshots/04-compose.jpg)
+
+### 试卷浏览
+
+按试卷名称搜索，查看原卷题目和题号索引，支持整卷加入试题篮或整卷导出。
+
+![试卷浏览](docs/screenshots/05-papers.jpg)
+
+### 试题篮与右侧悬浮区
+
+试题篮页的题序目录和导出操作集中在右侧悬浮面板中。可拖拽题目或使用上移、下移、移动到按钮调整顺序。
+
+![试题篮](docs/screenshots/06-basket.jpg)
+
+右侧悬浮面板包含试卷标题、题目统计、导出前检查和导出按钮；导出成功后会自动清空试题篮。
+
+![悬浮导出面板](docs/screenshots/07-floating-export.jpg)
+
+### 题库切换
+
+“使用说明”页会列出数据目录中的兼容数据库，可直接切换当前题库。切换后页面会重新加载，主题名称随数据库变化。
+
+![题库切换](docs/screenshots/08-database-switch.jpg)
 
 ## 启动
 
-### 1. 安装后端依赖
+### 1. 准备数据库
+
+将 SQLite 数据库放到：
+
+```text
+data/data.db
+```
+
+数据库不随仓库或离线包分发。其他题库可放在 `data/` 目录中，然后在“使用说明”页切换。
+
+数据库需要包含以下表及字段：
+
+| 表 | 主要字段 |
+|---|---|
+| `Questions` | `ID`、`题干`、`解析`、`难度`、`知识点`、`来源`、`题型` |
+| `Papers` | `ID`、`试卷` |
+| `Knowledge` | `ID`、`知识点` |
+| `Qtypes` | `ID`、`题型` |
+| `Difficulties` | `ID`、`难度` |
+| `db_info` | `file_name`、`question_count`、`max_id`、`encrypted` |
+
+页面标题和主题名称读取 `db_info.file_name`。例如文件名是 `初中语文.db`，页面显示“初中语文 · 智能题库系统”。
+
+### 2. 安装后端依赖
 
 ```bash
 python3 -m pip install --break-system-packages -r requirements.txt
 ```
 
-### 2. 启动题库
-
-生产模式直接运行根入口：
+### 3. 启动题库
 
 ```bash
 python3 main.py
@@ -62,30 +135,30 @@ python3 main.py
 ./start.sh
 ```
 
-访问：
+默认访问：
 
 - 题库页面：<http://127.0.0.1:8000>
+- 指定端口：`PORT=8001 python3 main.py`
 
-`static/app` 已包含构建后的前端。修改 React 源码后重新构建：
+`static/app` 已包含构建后的前端，普通运行不需要 Node，也不需要重新构建。
+
+## 前端开发模式
+
+仅在修改前端源码时需要：
 
 ```bash
 cd frontend
 npm install
-npm run build
-```
-
-### 前端开发模式
-
-```bash
-# 终端 1：后端
-python3 -m uvicorn main:app --host 127.0.0.1 --port 8000 --reload
-
-# 终端 2：前端
-cd frontend
 npm run dev
 ```
 
-开发页面地址为 <http://127.0.0.1:5173>，Vite 会把 `/api` 与 `/static` 代理到 `8000`。
+开发页面地址为 <http://127.0.0.1:5173>，Vite 会把 `/api` 与 `/static` 代理到后端 `8000` 端口。修改完成后：
+
+```bash
+npm run build
+```
+
+构建结果写入 `static/app`。
 
 ## 主要功能
 
@@ -93,13 +166,14 @@ npm run dev
 
 - 题库总量、试卷数、知识点数、题型数
 - 题型分布、难度构成、重点知识板块
-- 最新试卷与导出使用提示
+- 最近试卷与导出使用提示
+- 主题名称随当前数据库变化
 
 ### 题库检索
 
-- 题干关键词、题型、难度和排序放在搜索结果上方的筛选条中
-- 左侧知识点树在页面滚动时保持置顶，检索条件条随页面正常滚动
-- 知识点按最多三级树形结构展示，点击一级、二级或三级分类均可筛选
+- 题干关键词、题型、难度和排序放在搜索结果上方
+- 左侧知识点树最多支持三级结构
+- 点击任意分类节点即可按该分类下全部知识点筛选
 - 最新/最早排序与分页
 - 查看解析、单题导出、在线编辑、加入试题篮
 - 当前页批量加入试题篮
@@ -122,9 +196,10 @@ npm run dev
 ### 试题篮
 
 - 浏览器本地持久化
+- 右侧悬浮面板集中管理题序目录与导出操作
 - 支持拖动题目卡片或题序目录调整顺序
 - 支持上移、下移和“移动到指定位置”
-- 右侧提供可点击定位的题序目录，重排时带平滑动画
+- 题序目录点击可快速定位题目，重排时带平滑动画
 - 按题型统计
 - 清空试题篮
 - 导出成功后自动清空试题篮
@@ -142,7 +217,6 @@ npm run dev
 
 ### 题库参数
 
-- 查看难度、题型与知识点分类
 - 下载 `题库参数表.xlsx`
 - 知识点参数表支持最多三级结构：
 
@@ -159,7 +233,7 @@ npm run dev
 
 - 在“使用说明”页面列出数据目录中的题库文件
 - 可选择并切换到另一套兼容题库
-- 切换结果会记录到 `data/current-db.txt`，刷新后仍保持上次选择
+- 切换结果记录到 `data/current-db.txt`
 - 切换前建议先导出或清空试题篮，避免题号含义变化
 
 当前数据目录：`data/`
@@ -181,14 +255,7 @@ npm run dev
 | `GET` | `/api/databases` | 获取可切换题库列表 |
 | `POST` | `/api/databases/switch` | 切换当前题库 |
 
-旧数据库表结构保持不变：
-
-- `Questions`
-- `Papers`
-- `Knowledge`
-- `Qtypes`
-- `Difficulties`
-- `db_info`
+状态检查、Swagger、ReDoc 和独立 HTML2DOCX HTTP 接口均已关闭。
 
 ## 环境变量
 
@@ -203,10 +270,25 @@ npm run dev
 
 ## DOCX 导出说明
 
-HTML2DOCX 已内置在题库后端，与题库共用同一个端口，不依赖 8010 独立服务。
+HTML2DOCX 已内置在题库后端，与题库共用同一个端口，不依赖独立转换服务。
 
 - 题库导出接口：`POST /api/exports/docx`
-
-HTML2DOCX 的独立 HTTP 接口与健康检查接口已关闭，转换逻辑只由题库导出接口内部调用。
+- HTML2DOCX 独立 HTTP 接口已关闭，转换逻辑只由题库导出接口内部调用
 
 后端在内存中把题目 HTML 组装为完整试卷，调用内置转换器生成 DOCX，并直接返回浏览器。支持题干中的表格与图片（data URI、本地路径、网络地址）。不使用 pandoc。
+
+## Windows 离线包
+
+离线包位置：
+
+```text
+windows-package/智能题库-Windows.zip
+```
+
+特点：
+
+- 内置 Python 3.12 运行时和全部依赖
+- 前端已编译到 `static/app`，不包含 TSX 源码或 `node_modules`
+- 不包含数据库文件
+- 内置 HTML2DOCX 转换，不需要外部 8010 服务
+- 解压后把数据库放到 `data/data.db`，双击 `启动题库.bat` 即可使用

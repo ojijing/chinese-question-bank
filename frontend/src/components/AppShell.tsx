@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { NavLink, useLocation } from 'react-router-dom'
 import {
   BookOpenText,
@@ -8,6 +8,7 @@ import {
   ShoppingBasket,
   Sparkles,
 } from 'lucide-react'
+import { api } from '../api/client'
 import { useBasket } from '../context/BasketContext'
 
 const navigation = [
@@ -32,6 +33,18 @@ export function AppShell({ children }: { children: ReactNode }) {
   const basket = useBasket()
   const isDashboard = location.pathname === '/'
   const isBasketPage = location.pathname === '/basket'
+  const [subject, setSubject] = useState('题库')
+
+  useEffect(() => {
+    api.meta()
+      .then((data) => {
+        const file = data.database.file_name || ''
+        const name = file.replace(/\.(db|sqlite3?)$/i, '') || '题库'
+        setSubject(name)
+        document.title = `${name} · 智能题库系统`
+      })
+      .catch(() => undefined)
+  }, [])
 
   const copy =
     Object.entries(routeCopy).find(([path]) =>
@@ -42,7 +55,7 @@ export function AppShell({ children }: { children: ReactNode }) {
     <div className="app-shell">
       <header className="topbar">
         <div className="topbar-title">
-          <span className="eyebrow">语文题库 · 工作台</span>
+          <span className="eyebrow">题库工作台</span>
           <h1>{copy.title}</h1>
         </div>
 

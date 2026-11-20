@@ -13,7 +13,7 @@ BUILD_DIR = STATIC_DIR / "app"
 app = FastAPI(
     title=APP_NAME,
     version=APP_VERSION,
-    description="初中语文题库重建版：组卷、试题篮、试卷浏览、编辑与 DOCX 导出。",
+    description="通用题库系统：主题随数据库变化，支持组卷、试题篮、试卷浏览、编辑与 DOCX 导出。",
     docs_url=None,
     redoc_url=None,
     openapi_url=None,
@@ -51,7 +51,7 @@ def _frontend_index() -> FileResponse | HTMLResponse:
     return HTMLResponse(
         """
         <!doctype html><html lang="zh-CN"><meta charset="utf-8">
-        <title>初中语文智能题库</title>
+        <title>智能题库系统</title>
         <body style="font-family:sans-serif;padding:48px;background:#f7f3eb;color:#17221d">
           <h1>后端已启动</h1>
           <p>前端尚未构建。请运行 <code>cd frontend && npm install && npm run build</code>。</p>

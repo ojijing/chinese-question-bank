@@ -13,4 +13,4 @@ data/*.sqlite
 data/*.sqlite3
 data/current-db.txt
 data/docx-cache/
-windows-package/语文题库-Windows/
+windows-package/智能题库-Windows/
