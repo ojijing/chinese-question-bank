@@ -12,6 +12,8 @@
 
 GitHub：<https://github.com/ojijing/chinese-question-bank>
 
+数据库下载：[百度网盘](https://pan.baidu.com/s/1G91Z5NcO50rzfJ2NRMFYkQ?pwd=aabb)（提取码：`aabb`）
+
 ## 目录结构
 
 ```text
@@ -95,6 +97,8 @@ GitHub：<https://github.com/ojijing/chinese-question-bank>
 ## 启动
 
 ### 1. 准备数据库
+
+可从 README 顶部的“数据库下载”链接获取数据库文件。
 
 将 SQLite 数据库放到：
 
